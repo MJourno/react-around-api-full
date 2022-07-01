@@ -1,0 +1,40 @@
+{
+  "extends": "airbnb-base",
+  "rules": {
+    "no-underscore-dangle": [
+      2,
+      {
+        "allow": [
+          "_id"
+        ]
+      }
+    ],
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "log",
+          "error"
+        ]
+      }
+    ],
+    "arrow-parens": [
+      "error",
+      "as-needed"
+    ],
+    "no-shadow": [
+      "error",
+      {
+        "ignoreOnInitialization": true
+      }
+    ],
+    "object-shorthand": [
+      "error",
+      "consistent-as-needed"
+    ],
+    "func-names": [
+      "error",
+      "as-needed"
+    ]
+  }
+}
