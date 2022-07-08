@@ -1,0 +1,11 @@
+.body__container {
+  margin: 45px 0px 60px;
+
+}
+
+@media screen and (max-width:879px){
+  .body__container {
+    margin: 28px 0px 0px;
+  }
+}
+

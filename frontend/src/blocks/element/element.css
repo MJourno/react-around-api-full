@@ -1,0 +1,10 @@
+.element {
+  background-color:  #FFFFFF;
+  width: 282px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.element:hover {
+  cursor: pointer;
+}

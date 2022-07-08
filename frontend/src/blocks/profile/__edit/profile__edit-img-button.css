@@ -1,0 +1,16 @@
+.profile__edit-img-button {
+  background-image: url(../../../images/editVector.svg);
+  width: 120px;
+	height: 120px;
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-position: center;
+	border-style: none;
+	padding: 0px;
+	z-index: 9;
+  opacity: 0;
+	transition: opacity .2s linear;
+}
+.profile__edit-img-button:hover {
+	opacity: 1;
+}

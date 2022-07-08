@@ -1,0 +1,8 @@
+.header {
+  max-width: 880px;
+  margin: 0px auto 0px;
+  display: flex;
+  position: relative;
+  align-items: center;
+  border-bottom: 1px solid rgba(84, 84, 84, 0.7);
+}

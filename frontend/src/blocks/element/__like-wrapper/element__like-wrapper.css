@@ -1,0 +1,6 @@
+.element__like-wrapper {
+  display: flex;
+	flex-direction: column;
+  height: 35px;
+  margin: 22px 18px 22px auto;
+}
