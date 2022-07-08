@@ -1,4 +1,6 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
 
 const getUsers = async (req, res) => {
   try {
@@ -32,10 +34,13 @@ const getUserById = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  const { name, about, avatar } = req.body;
+  const { name, about, avatar, email, password } = req.body;
   try {
+    // bcrypt.hash({password},10);
+    const salt = bcrypt.genSalt(10);
+    const hash = bcrypt.hash({ password }, salt);
     const newUser = await User
-      .create({ name, about, avatar });
+      .create({ name, about, avatar, email, password: hash });
 
     res.send(newUser);
   } catch (err) {
@@ -81,10 +86,26 @@ const updateAvatar = async (req, res) => {
   }
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .select('+password')
+    .then((user) => {
+      const token = jwt.sign({ _id: user_id }, 'some-secret-key');
+      res.send({ token: jwt.sign({ _id: user_id }, 'super-strong-secret', { expiresIn: '7d' }) });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    })
+}
+
 module.exports = {
   getUsers,
   getUserById,
   createUser,
   updateProfile,
   updateAvatar,
+  login,
 };
