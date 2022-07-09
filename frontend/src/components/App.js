@@ -29,6 +29,7 @@ function App() {
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  // const [token, setToken] = useState(localStorage.getItem('token'));
 
   const history = useHistory();
 
