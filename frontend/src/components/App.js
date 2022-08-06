@@ -138,7 +138,8 @@ function App() {
     }
     auth
       .authorize(email, password)
-      .then(() => {
+      .then((token) => {
+        localStorage.setItem(token, token);
         setLoggedIn(true);
         setUserEmail(email);
         history.push('/');
@@ -157,6 +158,7 @@ function App() {
 
   React.useEffect(() => {
     const token = localStorage.getItem('token');
+    console.log('token', token);
     if (token) {
       auth
         .getContent(token)

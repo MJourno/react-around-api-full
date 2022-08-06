@@ -6,6 +6,8 @@ const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middleware/auth');
+const { ErrorHandler, customErrorHandler } = require('./errors/error');
+const { requestLogger, errorLogger } = require('./middleware/logger');
 
 // NODE_ENV=production
 // JWT_SECRET=eb28135ebcfc17578f96d4d65b6c7871f2c803be4180c165061d5c2db621c51b
@@ -13,7 +15,8 @@ const auth = require('./middleware/auth');
 // require('dotenv').config();
 
 const app = express();
-app.use(helmet());
+const { PORT = 3000 } = process.env;
+
 mongoose.connect('mongodb://localhost:27017/aroundb')
   .then(() => {
     console.log('connected to mongoose');
@@ -21,6 +24,7 @@ mongoose.connect('mongodb://localhost:27017/aroundb')
     console.log('cant connect', error);
   });
 
+app.use(helmet());
 app.use(bodyParser.json());
 
 // app.use((req, res, next) => {
@@ -31,7 +35,6 @@ app.use(bodyParser.json());
 //   next();
 // });
 
-const { PORT = 3000 } = process.env;
 
 app.get('/', (req, res) => {
   res.send('hello world');
@@ -43,9 +46,9 @@ app.use('/cards', auth, cardsRouter);
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-
-app.get('*', (req, res) => {
-  res.status(404).send({ message: 'Requested resource not found' });
+app.use((err, req, res, next) => {
+  // this is the error handler
+  customErrorHandler(err, res);
 });
 
 app.listen(PORT, () => {

@@ -1,51 +1,55 @@
 const Card = require('../models/card');
+const { ErrorHandler } = require('../errors/error');
 
-const getCards = async (req, res) => {
+const getCards = async (req, res, next) => {
   try {
     const cards = await Card.find({});
-
-    res.send(cards);
-  } catch (error) {
-    console.log('Error happened in getCards', error);
-    res.status(500).send({ message: 'Something went wrong' });
+    res.status(200).send(cards);
+    return cards;
+  } catch (err) {
+    console.log('Error happened in getCards', err);
+    return next(ErrorHandler(500, 'Something went wrong'));
   }
 };
 
-const createNewCard = async (req, res) => {
-  console.log(req.user._id);
+const createNewCard = async (req, res, next) => {
   const { name, link } = req.body;
   try {
-    const newCard = await Card.create({ name: name, link: link, owner: req.user._id });
-
-    res.send(newCard);
+    const newCard = await Card.create({
+      name: name,
+      link: link,
+      owner: req.user._id
+    }
+    );
+    res.status(201).send(newCard);
+    return newCard;
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Not a valid user id' });
+      return next(ErrorHandler(400, `${err.name}: Not a valid user id`));
     } else {
-      res.status(500).send({ message: 'Something went wrong' });
+      return next(ErrorHandler(500, `${err.name}: Something went wrong`));
     }
   }
 };
 
-const deleteCard = async (req, res) => {
-  console.log(req.params);
+const deleteCard = async (req, res, next) => {
   try {
     const cardById = await Card.findByIdAndRemove(req.params.card_id);
     if (cardById) {
       res.send(cardById);
     } else {
-      res.status(404).send({ message: 'Card ID not found' });
+      return next(ErrorHandler(404, 'Card ID not found'));
     }
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Not a valid user id' });
+      return next(ErrorHandler(400, `${err.name}: Not a valid user id`));
     } else {
-      res.status(500).send({ message: 'Something went wrong' });
+      return next(ErrorHandler(500, `${err.name}: Something went wrong`));
     }
   }
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.card_id,
     { $addToSet: { likes: req.user._id } },
@@ -54,11 +58,11 @@ const likeCard = (req, res) => {
     .then(card => res.send({ data: card }))
     .catch(err => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'NotValid Data' });
+        return next(ErrorHandler(400, `${err.name}: NotValid Data`));
       } if (err.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'User not found' });
+        return next(ErrorHandler(404, `${err.name}: User not found`));
       } else {
-        res.status(500).send({ message: 'An error has occurred on the server' });
+        return next(ErrorHandler(500, `${err.name}: An error has occurred on the server`));
       }
     });
 };
@@ -72,11 +76,11 @@ const unLikeCard = async (req, res) => {
     .then(card => res.send({ data: card }))
     .catch(err => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'NotValid Data' });
+        return next(ErrorHandler(400, `${err.name}: NotValid Data`));
       } if (err.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'User not found' });
+        return next(ErrorHandler(404, `${err.name}: User not found`));
       } else {
-        res.status(500).send({ message: 'An error has occurred on the server' });
+        return next(ErrorHandler(500, `${err.name}: An error has occurred on the server`));
       }
     });
 };

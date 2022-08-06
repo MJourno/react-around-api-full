@@ -35,6 +35,12 @@
     "func-names": [
       "error",
       "as-needed"
+    ],
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "next"
+      }
     ]
   }
 }
