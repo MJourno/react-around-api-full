@@ -26,6 +26,7 @@ mongoose.connect('mongodb://localhost:27017/aroundb')
 
 app.use(helmet());
 app.use(bodyParser.json());
+app.use(requestLogger);
 
 // app.use((req, res, next) => {
 //   req.user = {
@@ -45,6 +46,9 @@ app.use('/cards', auth, cardsRouter);
 
 app.post('/signin', login);
 app.post('/signup', createUser);
+
+app.use(errorLogger); // enabling the error logger
+app.use(errors()); // celebrate error handler
 
 app.use((err, req, res, next) => {
   // this is the error handler
