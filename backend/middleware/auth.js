@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { ErrorHandler } = require('../errors/error');
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 
 module.exports = (req, res, next) => {
 // getting authorization from the header
@@ -13,8 +15,10 @@ module.exports = (req, res, next) => {
   let payload;
   try {
 // verifying the token
-    payload = jwt.verify(token, 'super-strong-secret');
+    payload = jwt.verify(token,
+       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (err) {
+    console.log('Error happened in auth', err);
 // we return an error if something goes wrong
     // return handleAuthError(res);
     return next(ErrorHandler(401, 'Authorization Error'));

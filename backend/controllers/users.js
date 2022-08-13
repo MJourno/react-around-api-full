@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const { ErrorHandler } = require('../errors/error');
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const getUsers = async (req, res, next) => {
   try {
@@ -27,6 +28,7 @@ const getUserById = async (req, res, next) => {
       return user;
     }
   } catch (err) {
+    console.log('Error happened in getUserById', err);
     if (err.name === 'CastError') {
       return next(ErrorHandler(400, `${err.name}: NotValid Data`));
     } if (err.name === 'DocumentNotFoundError') {
@@ -62,6 +64,7 @@ const createUser = async (req, res, next) => {
       .then((hash) => User.create({ email, password: hash }))
       .then((user) => res.status(201).send({ _id: user._id, email: user.email }))
       .catch((err) => {
+        console.log('Error happened in createUser', err);
         if (err.name === 'MongoError') {
           return next(ErrorHandler(409, `${err.name}: User already taken`));
         } else {
@@ -69,6 +72,7 @@ const createUser = async (req, res, next) => {
         }
       });
   } catch (err) {
+    console.log('Error happened in createUser', err);
     if (err.name === 'ValidationError') {
       return next(ErrorHandler(400, `${err.name}: Something went wrong`));
     } else {
@@ -87,6 +91,7 @@ const updateProfile = async (req, res) => {
     res.send(newProfile);
     return newProfile;
   } catch (err) {
+    console.log('Error happened in updateProfile', err);
     if (err.name === 'ValidationError') {
       return next(ErrorHandler(400, `${err.name}: Not a valid user profile`));
     } else {
@@ -105,6 +110,7 @@ const updateAvatar = async (req, res) => {
     res.send(newAvatar);
     return newAvatar;
   } catch (err) {
+    console.log('Error happened in updateAvatar', err);
     if (err.name === 'ValidationError') {
       return next(ErrorHandler(400, `${err.name}: Not a valid user avatar`));
     } else {
@@ -117,11 +123,12 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.header('authorization', `Bearer ${token}`);
       res.status(200).send({ user });
     })
     .catch((err) => {
+      console.log('Error happened in login', err);
       return next(ErrorHandler(401, 'Something went wrong'));
     });
 };

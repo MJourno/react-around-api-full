@@ -11,13 +11,18 @@ const { requestLogger, errorLogger } = require('./middleware/logger');
 const { errors } = require('celebrate');
 const cors = require("cors");
 
-// NODE_ENV=production
-// JWT_SECRET=eb28135ebcfc17578f96d4d65b6c7871f2c803be4180c165061d5c2db621c51b
-
-// require('dotenv').config();
+require('dotenv').config();
+console.log(process.env.NODE_ENV); // production
 
 const app = express();
-const { PORT = 3000 } = process.env;
+const { PORT = 3001 } = process.env;
+
+const allowedOrigins = [
+  "https://majo.students.nomoreparties.sbs",
+  "https://www.majo.students.nomoreparties.sbs",
+  "https://api.majo.students.nomoreparties.sbs",
+  "http://localhost:3000",
+];
 
 mongoose.connect('mongodb://localhost:27017/aroundb')
   .then(() => {
@@ -28,7 +33,15 @@ mongoose.connect('mongodb://localhost:27017/aroundb')
 
 app.use(helmet());
 app.use(bodyParser.json());
+app.use(cors());
+app.options(allowedOrigins, cors());
 app.use(requestLogger);
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Server will crash now');
+  }, 0);
+});
 
 // app.use((req, res, next) => {
 //   req.user = {
@@ -37,24 +50,18 @@ app.use(requestLogger);
 
 //   next();
 // });
-const allowedOrigins = [
-  "https://majo.students.nomoreparties.sbs",
-  "https://www.majo.students.nomoreparties.sbs",
-  "https://api.majo.students.nomoreparties.sbs",
-];
-app.use(cors());
-app.options(allowedOrigins, cors());
-
 
 app.get('/', (req, res) => {
   res.send('hello world');
 });
 
-app.use('/users', auth, usersRouter);
-app.use('/cards', auth, cardsRouter);
-
 app.post('/signin', login);
 app.post('/signup', createUser);
+// authorization
+app.use(auth);
+
+app.use('/users', usersRouter);
+app.use('/cards', cardsRouter);
 
 app.use(errorLogger); // enabling the error logger
 app.use(errors()); // celebrate error handler

@@ -24,6 +24,7 @@ const createNewCard = async (req, res, next) => {
     res.status(201).send(newCard);
     return newCard;
   } catch (err) {
+    console.log('Error happened in createNewCard', err);
     if (err.name === 'ValidationError') {
       return next(ErrorHandler(400, `${err.name}: Not a valid user id`));
     } else {
@@ -41,6 +42,7 @@ const deleteCard = async (req, res, next) => {
       return next(ErrorHandler(404, 'Card ID not found'));
     }
   } catch (err) {
+    console.log('Error happened in deleteCard', err);
     if (err.name === 'ValidationError') {
       return next(ErrorHandler(400, `${err.name}: Not a valid user id`));
     } else {
@@ -57,6 +59,7 @@ const likeCard = (req, res, next) => {
   )
     .then(card => res.send({ data: card }))
     .catch(err => {
+      console.log('Error happened in likeCard', err);
       if (err.name === 'CastError') {
         return next(ErrorHandler(400, `${err.name}: NotValid Data`));
       } if (err.name === 'DocumentNotFoundError') {
@@ -75,6 +78,7 @@ const unLikeCard = async (req, res) => {
   )
     .then(card => res.send({ data: card }))
     .catch(err => {
+      console.log('Error happened in unlikeCard', err);
       if (err.name === 'CastError') {
         return next(ErrorHandler(400, `${err.name}: NotValid Data`));
       } if (err.name === 'DocumentNotFoundError') {
