@@ -17,12 +17,13 @@ const getUsers = async (req, res, next) => {
 };
 
 const getUserById = async (req, res, next) => {
+  console.log("user id", req.user._id);
   try {
     const user = await User
-      .findById(req.params.user_id)
+      .findById(req.user._id)
       .select('+password');
     if (!user) {
-      return next(ErrorHandler(404, 'User ID not found'));
+      return next(new ErrorHandler(404, 'User ID not found'));
     } else {
       res.status(200).send(user);
       return user;
@@ -30,11 +31,11 @@ const getUserById = async (req, res, next) => {
   } catch (err) {
     console.log('Error happened in getUserById', err);
     if (err.name === 'CastError') {
-      return next(ErrorHandler(400, `${err.name}: NotValid Data`));
+      return next(new ErrorHandler(400, `${err.name}: NotValid Data`));
     } if (err.name === 'DocumentNotFoundError') {
-      return next(ErrorHandler(404, `${err.name}: User not found`));
+      return next(new ErrorHandler(404, `${err.name}: User not found`));
     } else {
-      return next(ErrorHandler(500, 'An error has occurred on the server.'));
+      return next(new ErrorHandler(500, 'An error has occurred on the server.'));
     }
   }
 };
@@ -66,17 +67,17 @@ const createUser = async (req, res, next) => {
       .catch((err) => {
         console.log('Error happened in createUser', err);
         if (err.name === 'MongoError') {
-          return next(ErrorHandler(409, `${err.name}: User already taken`));
+          return next(new ErrorHandler(409, `${err.name}: User already taken`));
         } else {
-          return next(ErrorHandler(401, `${err.name}: Email or password are missing`));
+          return next(new ErrorHandler(401, `${err.name}: Email or password are missing`));
         }
       });
   } catch (err) {
     console.log('Error happened in createUser', err);
     if (err.name === 'ValidationError') {
-      return next(ErrorHandler(400, `${err.name}: Something went wrong`));
+      return next(new ErrorHandler(400, `${err.name}: Something went wrong`));
     } else {
-      return next(ErrorHandler(500, `${err.name}: An error has occurred on the server`));
+      return next(new ErrorHandler(500, `${err.name}: An error has occurred on the server`));
     }
   }
 };
@@ -93,9 +94,9 @@ const updateProfile = async (req, res) => {
   } catch (err) {
     console.log('Error happened in updateProfile', err);
     if (err.name === 'ValidationError') {
-      return next(ErrorHandler(400, `${err.name}: Not a valid user profile`));
+      return next(new ErrorHandler(400, `${err.name}: Not a valid user profile`));
     } else {
-      return next(ErrorHandler(500, 'Something went wrong'));
+      return next(new ErrorHandler(500, 'Something went wrong'));
     }
   }
 };
@@ -112,9 +113,9 @@ const updateAvatar = async (req, res) => {
   } catch (err) {
     console.log('Error happened in updateAvatar', err);
     if (err.name === 'ValidationError') {
-      return next(ErrorHandler(400, `${err.name}: Not a valid user avatar`));
+      return next(new ErrorHandler(400, `${err.name}: Not a valid user avatar`));
     } else {
-      return next(ErrorHandler(500, 'Something went wrong'));
+      return next(new ErrorHandler(500, 'Something went wrong'));
     }
   }
 };
@@ -123,13 +124,13 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.header('authorization', `Bearer ${token}`);
-      res.status(200).send({ user });
+      res.status(200).send({ user,token });
     })
     .catch((err) => {
       console.log('Error happened in login', err);
-      return next(ErrorHandler(401, 'Something went wrong'));
+      return next(new ErrorHandler(401, 'Something went wrong'));
     });
 };
 

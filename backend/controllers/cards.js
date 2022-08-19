@@ -8,7 +8,7 @@ const getCards = async (req, res, next) => {
     return cards;
   } catch (err) {
     console.log('Error happened in getCards', err);
-    return next(ErrorHandler(500, 'Something went wrong'));
+    return next(new ErrorHandler(500, 'Something went wrong'));
   }
 };
 
@@ -26,9 +26,9 @@ const createNewCard = async (req, res, next) => {
   } catch (err) {
     console.log('Error happened in createNewCard', err);
     if (err.name === 'ValidationError') {
-      return next(ErrorHandler(400, `${err.name}: Not a valid user id`));
+      return next(new ErrorHandler(400, `${err.name}: Not a valid user id`));
     } else {
-      return next(ErrorHandler(500, `${err.name}: Something went wrong`));
+      return next(new ErrorHandler(500, `${err.name}: Something went wrong`));
     }
   }
 };
@@ -39,14 +39,14 @@ const deleteCard = async (req, res, next) => {
     if (cardById) {
       res.send(cardById);
     } else {
-      return next(ErrorHandler(404, 'Card ID not found'));
+      return next(new ErrorHandler(404, 'Card ID not found'));
     }
   } catch (err) {
     console.log('Error happened in deleteCard', err);
     if (err.name === 'ValidationError') {
-      return next(ErrorHandler(400, `${err.name}: Not a valid user id`));
+      return next(new ErrorHandler(400, `${err.name}: Not a valid user id`));
     } else {
-      return next(ErrorHandler(500, `${err.name}: Something went wrong`));
+      return next(new ErrorHandler(500, `${err.name}: Something went wrong`));
     }
   }
 };
@@ -61,11 +61,11 @@ const likeCard = (req, res, next) => {
     .catch(err => {
       console.log('Error happened in likeCard', err);
       if (err.name === 'CastError') {
-        return next(ErrorHandler(400, `${err.name}: NotValid Data`));
+        return next(new ErrorHandler(400, `${err.name}: NotValid Data`));
       } if (err.name === 'DocumentNotFoundError') {
-        return next(ErrorHandler(404, `${err.name}: User not found`));
+        return next(new ErrorHandler(404, `${err.name}: User not found`));
       } else {
-        return next(ErrorHandler(500, `${err.name}: An error has occurred on the server`));
+        return next(new ErrorHandler(500, `${err.name}: An error has occurred on the server`));
       }
     });
 };
@@ -80,11 +80,11 @@ const unLikeCard = async (req, res) => {
     .catch(err => {
       console.log('Error happened in unlikeCard', err);
       if (err.name === 'CastError') {
-        return next(ErrorHandler(400, `${err.name}: NotValid Data`));
+        return next(new ErrorHandler(400, `${err.name}: NotValid Data`));
       } if (err.name === 'DocumentNotFoundError') {
-        return next(ErrorHandler(404, `${err.name}: User not found`));
+        return next(new ErrorHandler(404, `${err.name}: User not found`));
       } else {
-        return next(ErrorHandler(500, `${err.name}: An error has occurred on the server`));
+        return next(new ErrorHandler(500, `${err.name}: An error has occurred on the server`));
       }
     });
 };
