@@ -34,13 +34,18 @@ const createNewCard = async (req, res, next) => {
 };
 
 const deleteCard = async (req, res, next) => {
+  const cardId = req.params.card_id;
   try {
-    const cardById = await Card.findByIdAndRemove(req.params.card_id);
-    if (cardById) {
-      res.send(cardById);
-    } else {
+    const cardById = await Card.findById(cardId);
+    if (cardById === null) {
       return next(new ErrorHandler(404, 'Card ID not found'));
     }
+    if (cardById.owner._id.toString() !== req.user._id) {
+      return next(new ErrorHandler(403, 'you are not the card\'s owner'));
+    }
+    await Card.findByIdAndRemove(cardId);
+    res.status(200).send({message: `Card id ${cardId} was deleted.`});
+    return { message: `Card id ${cardId} was deleted.` };
   } catch (err) {
     console.log('Error happened in deleteCard', err);
     if (err.name === 'ValidationError') {

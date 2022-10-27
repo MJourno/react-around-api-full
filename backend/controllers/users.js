@@ -63,13 +63,14 @@ const createUser = async (req, res, next) => {
     bcrypt
       .hash(password, 10)
       .then((hash) => User.create({ email, password: hash }))
-      .then((user) => res.status(201).send({ _id: user._id, email: user.email }))
+      .then((user) =>{ res.status(201).send(user);
+      })
       .catch((err) => {
         console.log('Error happened in createUser', err);
-        if (err.name === 'MongoError') {
-          return next(new ErrorHandler(409, `${err.name}: User already taken`));
+        if (err.name === 'MongoServerError') {
+          res.status(409).send({ message: `${err.name}: User already exists.` });
         } else {
-          return next(new ErrorHandler(401, `${err.name}: Email or password are missing`));
+          res.status(401).send({ message: `${err.name}: Email or password are missing.` });
         }
       });
   } catch (err) {
