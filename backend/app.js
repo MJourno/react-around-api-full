@@ -15,12 +15,12 @@ require('dotenv').config();
 console.log(process.env.NODE_ENV); // production
 
 const app = express();
-const { PORT = 3001 } = process.env;
+const { PORT = 3000 } = process.env;
 
 const allowedOrigins = [
-  "https://majo.students.nomoreparties.sbs",
-  "https://www.majo.students.nomoreparties.sbs",
-  "https://api.majo.students.nomoreparties.sbs",
+  "https://project-15.mooo.com",
+  "https://www.project-15.mooo.com",
+  "https://api.project-15.mooo.com",
   "http://localhost:3000",
 ];
 

@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "celebrate": "^15.0.1",
+    "joi": "^17.9.1",
+    "winston": "^3.8.2"
+  }
+}
