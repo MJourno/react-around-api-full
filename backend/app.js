@@ -18,9 +18,9 @@ const app = express();
 const { PORT = 3000 } = process.env;
 
 const allowedOrigins = [
-  "https://project-15.mooo.com",
-  "https://www.project-15.mooo.com",
-  "https://api.project-15.mooo.com",
+  "https://project15.strangled.net",
+  "https://www.project15.strangled.net",
+  "https://api.project15.strangled.net",
   "http://localhost:3000",
 ];
 
