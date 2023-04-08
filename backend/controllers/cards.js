@@ -18,18 +18,16 @@ const createNewCard = async (req, res, next) => {
     const newCard = await Card.create({
       name: name,
       link: link,
-      owner: req.user._id
-    }
-    );
+      owner: req.user._id,
+    });
     res.status(201).send(newCard);
     return newCard;
   } catch (err) {
     console.log('Error happened in createNewCard', err);
     if (err.name === 'ValidationError') {
       return next(new ErrorHandler(400, `${err.name}: Not a valid user id`));
-    } else {
-      return next(new ErrorHandler(500, `${err.name}: Something went wrong`));
     }
+    return next(new ErrorHandler(500, `${err.name}: Something went wrong`));
   }
 };
 
@@ -44,15 +42,14 @@ const deleteCard = async (req, res, next) => {
       return next(new ErrorHandler(403, 'you are not the card\'s owner'));
     }
     await Card.findByIdAndRemove(cardId);
-    res.status(200).send({message: `Card id ${cardId} was deleted.`});
+    res.status(200).send({ message: `Card id ${cardId} was deleted.` });
     return { message: `Card id ${cardId} was deleted.` };
   } catch (err) {
     console.log('Error happened in deleteCard', err);
     if (err.name === 'ValidationError') {
       return next(new ErrorHandler(400, `${err.name}: Not a valid user id`));
-    } else {
-      return next(new ErrorHandler(500, `${err.name}: Something went wrong`));
     }
+    return next(new ErrorHandler(500, `${err.name}: Something went wrong`));
   }
 };
 
@@ -69,13 +66,12 @@ const likeCard = (req, res, next) => {
         return next(new ErrorHandler(400, `${err.name}: NotValid Data`));
       } if (err.name === 'DocumentNotFoundError') {
         return next(new ErrorHandler(404, `${err.name}: User not found`));
-      } else {
-        return next(new ErrorHandler(500, `${err.name}: An error has occurred on the server`));
       }
+      return next(new ErrorHandler(500, `${err.name}: An error has occurred on the server`));
     });
 };
 
-const unLikeCard = async (req, res) => {
+const unLikeCard = async (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.card_id,
     { $pull: { likes: req.user._id } }, // remove _id from the array
@@ -88,9 +84,8 @@ const unLikeCard = async (req, res) => {
         return next(new ErrorHandler(400, `${err.name}: NotValid Data`));
       } if (err.name === 'DocumentNotFoundError') {
         return next(new ErrorHandler(404, `${err.name}: User not found`));
-      } else {
-        return next(new ErrorHandler(500, `${err.name}: An error has occurred on the server`));
       }
+      return next(new ErrorHandler(500, `${err.name}: An error has occurred on the server`));
     });
 };
 

@@ -1,8 +1,9 @@
 const bcrypt = require('bcryptjs');
-const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 const { ErrorHandler } = require('../errors/error');
-const { NODE_ENV, JWT_SECRET } = process.env;
+
+// const { NODE_ENV, JWT_SECRET } = process.env;
 
 const getUsers = async (req, res, next) => {
   try {
@@ -17,26 +18,24 @@ const getUsers = async (req, res, next) => {
 };
 
 const getUserById = async (req, res, next) => {
-  console.log("user id", req.user._id);
+  console.log('user id', req.user._id);
   try {
     const user = await User
       .findById(req.user._id)
       .select('+password');
     if (!user) {
       return next(new ErrorHandler(404, 'User ID not found'));
-    } else {
-      res.status(200).send(user);
-      return user;
     }
+    res.status(200).send(user);
+    return user;
   } catch (err) {
     console.log('Error happened in getUserById', err);
     if (err.name === 'CastError') {
       return next(new ErrorHandler(400, `${err.name}: NotValid Data`));
     } if (err.name === 'DocumentNotFoundError') {
       return next(new ErrorHandler(404, `${err.name}: User not found`));
-    } else {
-      return next(new ErrorHandler(500, 'An error has occurred on the server.'));
     }
+    return next(new ErrorHandler(500, 'An error has occurred on the server.'));
   }
 };
 // module.exports.register = (req, res) => {
@@ -63,7 +62,8 @@ const createUser = async (req, res, next) => {
     bcrypt
       .hash(password, 10)
       .then((hash) => User.create({ email, password: hash }))
-      .then((user) =>{ res.status(201).send(user);
+      .then((user) => {
+        res.status(201).send(user);
       })
       .catch((err) => {
         console.log('Error happened in createUser', err);
@@ -127,7 +127,7 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.header('authorization', `Bearer ${token}`);
-      res.status(200).send({ user,token });
+      res.status(200).send({ user, token });
     })
     .catch((err) => {
       console.log('Error happened in login', err);
