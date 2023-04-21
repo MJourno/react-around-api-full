@@ -44,18 +44,6 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '62914fcaaa09522b2eacbe08',
-//   };
-
-//   next();
-// });
-
-app.get('/', (req, res) => {
-  res.send('hello world');
-});
-
 app.post('/signin', login);
 app.post('/signup', createUser);
 // authorization
@@ -64,12 +52,13 @@ app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
-app.use(errorLogger); // enabling the error logger
-app.use(errors()); // celebrate error handler
-app.use(() => {
+app.use(() => { /** The Not Found route should be placed above the errorLogger, so this 404 error also will be logged */
   throw new ErrorHandler(404, 'The requested resource was not found.');
 });
+app.use(errorLogger); // enabling the error logger
+
 app.use((err, req, res, next) => {
+  console.log(err);
   // this is the error handler
   customErrorHandler(err, res);
 });

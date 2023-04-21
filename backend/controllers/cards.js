@@ -1,5 +1,6 @@
 const Card = require('../models/card');
 const { ErrorHandler } = require('../errors/error');
+const card = require('../models/card');
 
 const getCards = async (req, res, next) => {
   try {
@@ -13,6 +14,7 @@ const getCards = async (req, res, next) => {
 };
 
 const createNewCard = async (req, res, next) => {
+  console.log(req.user._id);
   const { name, link } = req.body;
   try {
     const newCard = await Card.create({
@@ -58,8 +60,11 @@ const likeCard = (req, res, next) => {
     req.params.card_id,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  )
-    .then(card => res.send({ data: card }))
+  ).orFail(next(new ErrorHandler(404, `this card does not exist`)))
+    .then((card) => {
+      console.log(card, "card")
+      res.send({ data: card })
+    })
     .catch(err => {
       console.log('Error happened in likeCard', err);
       if (err.name === 'CastError') {
@@ -76,7 +81,7 @@ const unLikeCard = async (req, res, next) => {
     req.params.card_id,
     { $pull: { likes: req.user._id } }, // remove _id from the array
     { new: true },
-  )
+  ).orFail(next(new ErrorHandler(404, `this card does not exist`)))
     .then(card => res.send({ data: card }))
     .catch(err => {
       console.log('Error happened in unlikeCard', err);

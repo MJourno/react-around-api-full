@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { ErrorHandler } = require('../errors/error');
+const { NODE_ENV } = require('../utils/constans');
 
 // const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -18,61 +19,37 @@ const getUsers = async (req, res, next) => {
 };
 
 const getUserById = async (req, res, next) => {
-  console.log('user id', req.user._id);
+  console.log(typeof (req.user._id));
   try {
-    const user = await User
-      .findById(req.user._id)
-      .select('+password');
+    const user = await User.findById(req.user._id)
     if (!user) {
       return next(new ErrorHandler(404, 'User ID not found'));
     }
     res.status(200).send(user);
-    return user;
   } catch (err) {
     console.log('Error happened in getUserById', err);
     if (err.name === 'CastError') {
-      return next(new ErrorHandler(400, `${err.name}: NotValid Data`));
     } if (err.name === 'DocumentNotFoundError') {
-      return next(new ErrorHandler(404, `${err.name}: User not found`));
     }
     return next(new ErrorHandler(500, 'An error has occurred on the server.'));
   }
 };
-// module.exports.register = (req, res) => {
-//   const { email, password } = req.body;
-//   bcrypt
-//     .hash(password, 10)
-//     .then((hash) => User.create({
-//       email,
-//       password: hash,
-//     }))
-//     .then((user) => {
-//       res.status(201).send({
-//         _id: user._id,
-//       });
-//     })
-//     .catch((err) => {
-//       res.status(400).send(err);
-//     });
-// };
 
 const createUser = async (req, res, next) => {
   const { email, password } = req.body;
   try {
-    bcrypt
-      .hash(password, 10)
-      .then((hash) => User.create({ email, password: hash }))
-      .then((user) => {
-        res.status(201).send(user);
-      })
-      .catch((err) => {
-        console.log('Error happened in createUser', err);
-        if (err.name === 'MongoServerError') {
-          res.status(409).send({ message: `${err.name}: User already exists.` });
-        } else {
-          res.status(401).send({ message: `${err.name}: Email or password are missing.` });
-        }
-      });
+    if (!email && !password) {
+      return next(new ErrorHandler(400, `${err.name}: email and password reqwired`));
+    }
+    const isUserExists = await User.findOne({ email });
+    if (isUserExists) {
+      return next(new ErrorHandler(409, `${err.name}: email already exists`));
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({ email, password: hashedPassword })
+    if (hashedPassword && user) {
+      res.status(201).send({ id: user._id, email: user.email });
+    }
   } catch (err) {
     console.log('Error happened in createUser', err);
     if (err.name === 'ValidationError') {
@@ -83,7 +60,7 @@ const createUser = async (req, res, next) => {
   }
 };
 
-const updateProfile = async (req, res) => {
+const updateProfile = async (req, res, next) => {
   const { name, about } = req.body;
   try {
     const newProfile = await User
@@ -102,7 +79,7 @@ const updateProfile = async (req, res) => {
   }
 };
 
-const updateAvatar = async (req, res) => {
+const updateAvatar = async (req, res, next) => {
   const { avatar } = req.body;
   try {
     const newAvatar = await User
@@ -125,9 +102,8 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-      res.header('authorization', `Bearer ${token}`);
-      res.status(200).send({ user, token });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? process.env.JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+      res.status(200).send({ token });
     })
     .catch((err) => {
       console.log('Error happened in login', err);
