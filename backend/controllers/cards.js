@@ -60,7 +60,7 @@ const likeCard = (req, res, next) => {
     req.params.card_id,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  ).orFail(next(new ErrorHandler(404, `this card does not exist`)))
+  ).orFail(() => next(new ErrorHandler(404, `this card does not exist`)))
     .then((card) => {
       console.log(card, "card")
       res.send({ data: card })
@@ -81,7 +81,7 @@ const unLikeCard = async (req, res, next) => {
     req.params.card_id,
     { $pull: { likes: req.user._id } }, // remove _id from the array
     { new: true },
-  ).orFail(next(new ErrorHandler(404, `this card does not exist`)))
+  ).orFail(() => next(new ErrorHandler(404, `this card does not exist`)))
     .then(card => res.send({ data: card }))
     .catch(err => {
       console.log('Error happened in unlikeCard', err);

@@ -52,10 +52,11 @@ app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
-app.use(() => { /** The Not Found route should be placed above the errorLogger, so this 404 error also will be logged */
+app.use(() => {
   throw new ErrorHandler(404, 'The requested resource was not found.');
 });
 app.use(errorLogger); // enabling the error logger
+app.use(errors());// celebrate error handler
 
 app.use((err, req, res, next) => {
   console.log(err);

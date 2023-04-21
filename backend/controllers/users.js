@@ -4,12 +4,9 @@ const User = require('../models/user');
 const { ErrorHandler } = require('../errors/error');
 const { NODE_ENV } = require('../utils/constans');
 
-// const { NODE_ENV, JWT_SECRET } = process.env;
-
 const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({})
-      .select('+password');
     res.status(200).send(users);
     return users;
   } catch (err) {
@@ -39,11 +36,11 @@ const createUser = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     if (!email && !password) {
-      return next(new ErrorHandler(400, `${err.name}: email and password reqwired`));
+      return next(new ErrorHandler(400, `email and password reqwired`));
     }
     const isUserExists = await User.findOne({ email });
     if (isUserExists) {
-      return next(new ErrorHandler(409, `${err.name}: email already exists`));
+      return next(new ErrorHandler(409, `email already exists`));
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({ email, password: hashedPassword })
@@ -65,7 +62,6 @@ const updateProfile = async (req, res, next) => {
   try {
     const newProfile = await User
       .findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-      .select('+password')
       .orFail();
     res.send(newProfile);
     return newProfile;
@@ -84,7 +80,6 @@ const updateAvatar = async (req, res, next) => {
   try {
     const newAvatar = await User
       .findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
-      .select('+password')
       .orFail();
     res.send(newAvatar);
     return newAvatar;

@@ -1,5 +1,5 @@
 # Around the U.S. Back End  
-  https://api.majo.students.nomoreparties.sbs
+https://api.project15.strangled.net .
 ## Directories  
   
 `/data` — JSON files to temporarily emulate database integration.  
