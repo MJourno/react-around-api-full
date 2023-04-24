@@ -30,7 +30,7 @@
     ],
     "object-shorthand": [
       "error",
-      "consistent-as-needed"
+      "never"
     ],
     "func-names": [
       "error",
@@ -40,6 +40,12 @@
       "error",
       {
         "argsIgnorePattern": "next"
+      }
+    ],
+    "consistent-return": [
+      "error",
+      {
+        "treatUndefinedAsUnspecified": false
       }
     ]
   }

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { ErrorHandler } = require('../errors/error');
+
 const { JWT_SECRET } = process.env;
 require('dotenv').config();
 const { NODE_ENV } = require('../utils/constans');
@@ -9,7 +10,7 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
   // check the header exists and starts with 'Bearer '
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    console.log(authorization, "authorization2");
+    console.log(authorization, 'authorization2');
     return next(new ErrorHandler(401, 'Authorization Error'));
   }
   // getting the token
@@ -31,5 +32,5 @@ module.exports = (req, res, next) => {
   }
   // assigning the payload to the request object
   // sending the request to the next middleware
-  next();
+  return next();
 };

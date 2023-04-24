@@ -1,6 +1,6 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
-const validator = require('validator');
+// const validator = require('validator');
 
 const router = express.Router();
 const {
@@ -11,12 +11,12 @@ const {
   unLikeCard,
 } = require('../controllers/cards');
 
-const validateURL = (value, helpers) => {
-  if (validator.isURL(value)) {
-    return value;
-  }
-  return helpers.error('string.uri');
-};
+// const validateURL = (value, helpers) => {
+//   if (validator.isURL(value)) {
+//     return value;
+//   }
+//   return helpers.error('string.uri');
+// };
 
 router.get('/', getCards);
 router.post(

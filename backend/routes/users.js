@@ -6,7 +6,6 @@ const router = express.Router();
 const {
   getUsers,
   getUserById,
-  createUser,
   updateProfile,
   updateAvatar,
 } = require('../controllers/users');
@@ -16,7 +15,7 @@ const validateURL = (value, helpers) => {
     return value;
   }
   return helpers.error('string.uri');
-}
+};
 
 router.get('/', getUsers);
 router.get('/me', getUserById);
@@ -26,11 +25,14 @@ router.patch('/me', celebrate({
     about: Joi.string().min(2).max(30),
   }),
 }), updateProfile);
-router.patch('/me/avatar', celebrate({
-  body: Joi.object().keys({
-    avatar: Joi.string().required().custom(validateURL),
+router.patch(
+  '/me/avatar',
+  celebrate({
+    body: Joi.object().keys({
+      avatar: Joi.string().required().custom(validateURL),
+    }),
   }),
-}),
-  updateAvatar);
+  updateAvatar,
+);
 
 module.exports = router;

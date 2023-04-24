@@ -10,8 +10,8 @@ const handleErrors = (err, res) => {
   const { statusCode, message } = err;
   res.status(statusCode).json({
     status: 'error',
-    statusCode,
-    message,
+    statusCode: statusCode,
+    message: message,
   });
 };
 
@@ -21,13 +21,21 @@ const handleServerError = (err, res) => {
   });
 };
 
+// const customErrorHandler = (err, res) => (
+//   err instanceof ErrorHandler
+//     ? handleErrors(err, res)
+//     : handleServerError(err, res));
+
 const customErrorHandler = (err, res) => {
-  err instanceof ErrorHandler
-    ? handleErrors(err, res)
-    : handleServerError(err, res);
+  console.log(err, 'errcall');
+  if (err instanceof ErrorHandler) {
+    handleErrors(err, res);
+  } else {
+    handleServerError(err, res);
+  }
 };
 
 module.exports = {
-  ErrorHandler,
-  customErrorHandler,
+  ErrorHandler: ErrorHandler,
+  customErrorHandler: customErrorHandler,
 };

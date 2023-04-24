@@ -62,6 +62,7 @@ app.use((err, req, res, next) => {
   console.log(err);
   // this is the error handler
   customErrorHandler(err, res);
+  console.log(customErrorHandler,'testErr');
 });
 
 app.listen(PORT, () => {
